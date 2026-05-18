@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { PawPrint } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function LoginForm() {
   const [loginData, setLoginData] = useState({
@@ -28,12 +29,16 @@ export default function LoginForm() {
         },
       );
 
+      toast.success("Inicio de sesión exitoso");
+
       console.log("RESPUESTA COMPLETA:");
       console.log(response);
 
       console.log("DATA:");
       console.log(response.data);
     } catch (error) {
+
+      toast.error("Credenciales inválidas");
       console.log("ERROR:");
       console.log(error);
 
@@ -60,7 +65,7 @@ export default function LoginForm() {
         </p>
       </div>
 
-      //hola esto es un comentario de prueba
+    
 
       <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5 mt-2">
         {/* USERNAME */}
