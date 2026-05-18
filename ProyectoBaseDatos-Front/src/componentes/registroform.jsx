@@ -1,43 +1,80 @@
-import React, { useState } from 'react';
-import { PawPrint } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { PawPrint } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function RegistroForm() {
+  const navigate = useNavigate();
   const [registroData, setRegistroData] = useState({
-    nombre: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setRegistroData({
       ...registroData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validación básica de contraseñas
+    setError("");
+
     if (registroData.password !== registroData.confirmPassword) {
-      alert("¡Las contraseñas no coinciden!");
+      setError("Las contraseñas no coinciden");
       return;
     }
 
-    console.log("Registrando usuario con datos:", registroData);
+    setLoading(true);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 90000);
+
+    try {
+      const res = await fetch(
+        "https://proyectobs-backend.onrender.com/api/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            username: registroData.username,
+            email: registroData.email,
+            password: registroData.password,
+            rol: "USUARIO",
+          }),
+        },
+      );
+
+      clearTimeout(timeout);
+      const data = await res.json();
+
+      if (!data.success) {
+        setError(data.error || "Error al registrar");
+        return;
+      }
+
+      navigate("/login");
+    } catch (err) {
+      if (err.name === "AbortError") {
+        setError("El servidor tardó demasiado. Intenta de nuevo.");
+      } else {
+        setError("Error de conexión con el servidor");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="w-full max-w-md bg-[#fafaf6] border border-gray-200/60 rounded-[32px] p-10 flex flex-col items-center gap-6 shadow-sm">
-      
-      {/* Icono Huellitas */}
       <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-700 text-white shadow-sm">
         <PawPrint className="w-6 h-6" />
       </div>
 
-      {/* Título de Bienvenida */}
       <div className="text-center flex flex-col gap-1">
         <h1 className="text-2xl font-bold text-gray-800 tracking-tight">
           Crea tu cuenta
@@ -47,28 +84,38 @@ export default function RegistroForm() {
         </p>
       </div>
 
-      {/* Formulario de registro */}
+      {error && (
+        <div className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-600 font-medium text-center">
+          {error}
+        </div>
+      )}
+
+      {loading && (
+        <div className="w-full px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-sm text-emerald-700 font-medium text-center">
+          ⏳ Conectando al servidor, puede tardar unos segundos...
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4 mt-2">
-        
-        {/* Input Nombre Completo */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-bold text-gray-700 pl-1">Nombre completo</label>
-          <input 
-            type="text" 
-            name="nombre"
-            value={registroData.nombre}
+          <label className="text-sm font-bold text-gray-700 pl-1">
+            Usuario
+          </label>
+          <input
+            type="text"
+            name="username"
+            value={registroData.username}
             onChange={handleChange}
-            placeholder="María García"
+            placeholder="maria_garcia"
             className="w-full px-4 py-3 bg-[#f4f3ea]/60 border border-gray-200 rounded-2xl focus:outline-none focus:border-emerald-600 font-medium text-gray-700 placeholder-gray-400/80 transition-colors"
             required
           />
         </div>
 
-        {/* Input Email */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-bold text-gray-700 pl-1">Email</label>
-          <input 
-            type="email" 
+          <input
+            type="email"
             name="email"
             value={registroData.email}
             onChange={handleChange}
@@ -78,11 +125,12 @@ export default function RegistroForm() {
           />
         </div>
 
-        {/* Input Contraseña */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-bold text-gray-700 pl-1">Contraseña</label>
-          <input 
-            type="password" 
+          <label className="text-sm font-bold text-gray-700 pl-1">
+            Contraseña
+          </label>
+          <input
+            type="password"
             name="password"
             value={registroData.password}
             onChange={handleChange}
@@ -93,11 +141,12 @@ export default function RegistroForm() {
           />
         </div>
 
-        {/* CAMBIO AQUÍ: Input Confirmar Contraseña en vez de Teléfono */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-bold text-gray-700 pl-1">Confirmar contraseña</label>
-          <input 
-            type="password" 
+          <label className="text-sm font-bold text-gray-700 pl-1">
+            Confirmar contraseña
+          </label>
+          <input
+            type="password"
             name="confirmPassword"
             value={registroData.confirmPassword}
             onChange={handleChange}
@@ -107,26 +156,26 @@ export default function RegistroForm() {
           />
         </div>
 
-        {/* Botón Enviar */}
         <div className="mt-3">
-          <button 
+          <button
             type="submit"
-            className="w-full py-3.5 rounded-full bg-emerald-700 text-white font-semibold hover:bg-emerald-800 transition-all shadow-md text-center"
+            disabled={loading}
+            className="w-full py-3.5 rounded-full bg-emerald-700 text-white font-semibold hover:bg-emerald-800 transition-all shadow-md text-center disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Crear cuenta
+            {loading ? "Creando cuenta..." : "Crear cuenta"}
           </button>
         </div>
-
       </form>
 
-      {/* Volver al Login */}
       <div className="text-sm text-gray-600 font-medium mt-1">
-        ¿Ya tienes cuenta?{' '}
-        <Link to="/login" className="text-emerald-700 font-bold hover:underline">
+        ¿Ya tienes cuenta?{" "}
+        <Link
+          to="/login"
+          className="text-emerald-700 font-bold hover:underline"
+        >
           Inicia sesión
         </Link>
       </div>
-
     </div>
   );
 }
