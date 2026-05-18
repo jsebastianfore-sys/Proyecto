@@ -3,8 +3,10 @@ import { PawPrint } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
+  const navigate = useNavigate();
   const [loginData, setLoginData] = useState({
     username: "",
     password: "",
@@ -30,14 +32,16 @@ export default function LoginForm() {
       );
 
       toast.success("Inicio de sesión exitoso");
+      localStorage.setItem("auth", "true");
 
       console.log("RESPUESTA COMPLETA:");
       console.log(response);
 
       console.log("DATA:");
       console.log(response.data);
-    } catch (error) {
 
+      navigate("/dashboard");
+    } catch (error) {
       toast.error("Credenciales inválidas");
       console.log("ERROR:");
       console.log(error);
@@ -64,8 +68,6 @@ export default function LoginForm() {
           Inicia sesión para continuar
         </p>
       </div>
-
-    
 
       <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5 mt-2">
         {/* USERNAME */}

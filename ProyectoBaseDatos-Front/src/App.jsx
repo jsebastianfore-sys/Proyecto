@@ -1,28 +1,35 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
+import ProtectedRoute from "./componentes/ProtectedRoute";
 
 // Páginas Públicas de la Web
-import Home from './pages/home';
-import ServiciosPage from './pages/serviciosPage';
-import ContactoPage from './pages/contactoPage';
-import LoginPage from './pages/loginPage';
-import RegistroPage from './pages/registroPage';
+import Home from "./pages/home";
+import ServiciosPage from "./pages/serviciosPage";
+import ContactoPage from "./pages/contactoPage";
+import LoginPage from "./pages/loginPage";
+import RegistroPage from "./pages/registroPage";
 
 // Contenedor Principal del Panel
-import DashboardPage from './pages/dashboardPage';
+import DashboardPage from "./pages/dashboardPage";
 
 // Importación de las 11 Vistas de las Tablas
-import CitasView from './componentes/citasView';
-import ConsultasView from './componentes/consultasView';
-import MascotasView from './componentes/mascotasView';
-import {EspecialidadesView} from './componentes/especialidadesView';
-import EspeciesView from './componentes/especiesView';
-import FacturasView from './componentes/facturasView';
-import MedicamentosView from './componentes/medicamentosView';
-import PropietariosView from './componentes/propietariosView';
-import TratamientosView from './componentes/tratamientosView';
-import UsuariosView from './componentes/usuariosView';
-import VeterinariosView from './componentes/veterinariosView';
+import CitasView from "./componentes/citasView";
+import ConsultasView from "./componentes/consultasView";
+import MascotasView from "./componentes/mascotasView";
+import { EspecialidadesView } from "./componentes/especialidadesView";
+import EspeciesView from "./componentes/especiesView";
+import FacturasView from "./componentes/facturasView";
+import MedicamentosView from "./componentes/medicamentosView";
+import PropietariosView from "./componentes/propietariosView";
+import TratamientosView from "./componentes/tratamientosView";
+import UsuariosView from "./componentes/usuariosView";
+import VeterinariosView from "./componentes/veterinariosView";
 
 function App() {
   return (
@@ -34,13 +41,17 @@ function App() {
         <Route path="/contacto" element={<ContactoPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registro" element={<RegistroPage />} />
-        
-        {/* Rutas Hijas del Panel de Control */}
-        <Route path="/dashboard" element={<DashboardPage />}>
-          {/* Si entra a /dashboard a secas, redirige de inmediato a citas */}
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Navigate to="citas" replace />} />
-          
-          {/* Sub-vistas asignadas correspondientemente */}
+
           <Route path="citas" element={<CitasView />} />
           <Route path="consultas" element={<ConsultasView />} />
           <Route path="mascotas" element={<MascotasView />} />
@@ -53,7 +64,7 @@ function App() {
           <Route path="usuarios" element={<UsuariosView />} />
           <Route path="veterinarios" element={<VeterinariosView />} />
         </Route>
-        
+
         {/* Ruta comodín por si se pierde el usuario */}
         <Route path="*" element={<Home />} />
       </Routes>
