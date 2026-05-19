@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { PawPrint } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -31,6 +31,11 @@ export default function LoginForm() {
         },
       );
 
+      const { token, user } = response.data.data;
+
+      // Guardar token y datos del usuario
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
       toast.success("Inicio de sesión exitoso");
       localStorage.setItem("auth", "true");
 
@@ -54,7 +59,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-[#fafaf6] border border-gray-200/60 rounded-[32px] p-10 flex flex-col items-center gap-6 shadow-sm">
+    <div className="w-full max-w-md bg-[#fafaf6] border border-gray-200/60 rounded-[4xl] p-10 flex flex-col items-center gap-6 shadow-sm">
       <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-700 text-white shadow-sm">
         <PawPrint className="w-6 h-6" />
       </div>
