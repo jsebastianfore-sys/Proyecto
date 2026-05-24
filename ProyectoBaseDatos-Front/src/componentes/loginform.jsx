@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { PawPrint } from "lucide-react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+
+import { loginRequest } from "../services/auth.service";
+import { useAuth } from "../hooks/useAuth";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const [loading, setLoading] = useState(false);
+
   const [loginData, setLoginData] = useState({
     username: "",
     password: "",
@@ -23,38 +28,49 @@ export default function LoginForm() {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "https://proyectobs-backend.onrender.com/api/auth/login",
-        {
-          username: loginData.username,
-          password: loginData.password,
-        },
-      );
+      setLoading(true);
 
-      const { token, user } = response.data.data;
+      const response = await loginRequest({
+        username: loginData.username,
+        password: loginData.password,
+      });
 
-      // Guardar token y datos del usuario
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      toast.success("Inicio de sesión exitoso");
-      localStorage.setItem("auth", "true");
+      const { token, user } = response.data;
 
-      console.log("RESPUESTA COMPLETA:");
-      console.log(response);
+      login({ token, user });
 
-      console.log("DATA:");
-      console.log(response.data);
+      toast.success(`Bienvenido ${user.username}`);
 
-      navigate("/dashboard");
+      // Redirección según rol
+      switch (user.rol) {
+        case "SUPERADMIN":
+          navigate("/dashboard");
+          break;
+
+        case "ADMIN":
+          navigate("/dashboard");
+          break;
+
+        case "USUARIO":
+          navigate("/dashboard");
+          break;
+
+        case "CONSULTA":
+          navigate("/dashboard");
+          break;
+
+        default:
+          navigate("/");
+      }
     } catch (error) {
-      toast.error("Credenciales inválidas");
-      console.log("ERROR:");
       console.log(error);
 
-      if (error.response) {
-        console.log("DATA ERROR:");
-        console.log(error.response.data);
-      }
+      const message =
+        error?.response?.data?.message || "Credenciales inválidas";
+
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -112,9 +128,10 @@ export default function LoginForm() {
         <div className="mt-2">
           <button
             type="submit"
-            className="w-full py-3.5 rounded-full bg-emerald-700 text-white font-semibold hover:bg-emerald-800 transition-all shadow-md"
+            disabled={loading}
+            className="w-full py-3.5 rounded-full bg-emerald-700 text-white font-semibold hover:bg-emerald-800 transition-all shadow-md disabled:opacity-50"
           >
-            Iniciar sesión
+            {loading ? "Ingresando..." : "Iniciar sesión"}
           </button>
         </div>
       </form>
