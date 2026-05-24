@@ -22,7 +22,7 @@ import DashboardPage from "./pages/dashboardPage";
 import CitasView from "./componentes/citasView";
 import ConsultasView from "./componentes/consultasView";
 import MascotasView from "./componentes/mascotasView";
-import EspecialidadesView from "./componentes/especialidadesview";
+import { EspecialidadesView } from "./componentes/especialidadesView";
 import EspeciesView from "./componentes/especiesView";
 import FacturasView from "./componentes/facturasView";
 import MedicamentosView from "./componentes/medicamentosView";

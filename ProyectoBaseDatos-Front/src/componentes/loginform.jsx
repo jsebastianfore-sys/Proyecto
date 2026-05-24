@@ -28,12 +28,13 @@ export default function LoginForm() {
     e.preventDefault();
 
     try {
-      setLoading(true);
-
-      const response = await loginRequest({
-        username: loginData.username,
-        password: loginData.password,
-      });
+      const response = await axios.post(
+        "https://proyectobs-backend.onrender.com/api/auth/login",
+        {
+          username: loginData.username,
+          password: loginData.password,
+        },
+      );
 
       const { token, user } = response.data;
 

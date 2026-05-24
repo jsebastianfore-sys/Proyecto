@@ -138,10 +138,10 @@ export default function MascotasView() {
         {canCreate && (
           <button
             onClick={() => abrirModal()}
-            className="flex items-center gap-2 px-5 py-2.5 bg-emerald-800 text-white rounded-full font-semibold hover:bg-emerald-900 shadow-sm text-sm transition-all cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2.5 bg-emerald-800 text-white rounded-full font-semibold hover:bg-emerald-900 shadow-sm text-sm transition-all"
           >
             <Plus className="w-4 h-4" />
-            <span>Nueva Mascota</span>
+            <span>Nueva mascota</span>
           </button>
         )}
       </div>
